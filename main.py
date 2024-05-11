@@ -14,7 +14,49 @@ pass_score = 6
 start_time = time.process_time()
 
 
+def process_image_files(image_directory):
+    datasets = []
+    correct_ans = []
 
+    for filename in os.listdir(image_directory):
+        if filename.endswith('.jpg') or filename.endswith('.png'):
+            img_path = os.path.join(image_directory, filename)
+            image = cv2.imread(img_path)
+
+            answer_sheet = cv2.resize(find_paper(image), (827, 1669))
+            student_id = id_block_read(answer_sheet, debug=False)
+            answers = ans_block_read(answer_sheet, 5)
+
+            if student_id == 0:
+                correct_ans = answers
+
+            data = {'id': student_id, 'answers': answers}
+            datasets.append(data.copy())
+
+    datasets = sorted(datasets, key=lambda data: data['id'])[1:]
+
+    for (idx, data) in enumerate(datasets):
+        datasets[idx]['answers_check'] = []
+
+        for (base, student) in zip(correct_ans, data['answers']):
+            datasets[idx]['answers_check'].append(base == student)
+
+    for data in datasets:
+        (_, count) = np.unique(data['answers_check'], return_counts=True)
+        data['correct'] = count[1]
+        data['incorrect'] = count[0]
+
+    df = pd.DataFrame(datasets)
+    df['pass'] = ["Pass" if d >= pass_score else "Not pass" for d in df['correct']]
+
+    return df
+
+# Example usage:
+# df = process_image_files('./uploads')
+# df.to_excel('out.xlsx', index=False)
+
+
+'''
 def image_path_generator(directory):
     for filename in os.listdir(directory):
         if filename.endswith('.jpg') or filename.endsiwith('.png'):
@@ -71,3 +113,4 @@ elapsed_time = time.process_time() - start_time
 
 print(f'Done! Time elapsed: {elapsed_time:.2f} secs')
 print(f'Exporting data to excel spreadsheet at: {os.path.abspath("./out.xlsx")}')
+'''
