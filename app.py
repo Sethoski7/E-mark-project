@@ -21,46 +21,64 @@ from flask import Flask, render_template, redirect, send_file, request, send_fro
 
 
 students_file_name_ = 'students.jpg'
-
+current_directory = os.getcwd()
+print("Current Directory:", current_directory)
+# telling flask where to find the uploaded files in the folder
 app = Flask(__name__)
-UPLOAD_FOLDER_1 = './uploads'
+UPLOAD_FOLDER_1 = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
 app.config['UPLOAD_FOLDER_1'] = UPLOAD_FOLDER_1
 
-ANSWERS = './uploads'
+ANSWERS = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
 app.config['ANSWERS'] = ANSWERS
 
-RESULT_FOLDER = './result'
-app.config['RESULT_FOLDER'] = RESULT_FOLDER
+#RESULT_FOLDER = './result'
+#app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
     if request.method == 'POST':
-
-        directory = './result'
-        for f in os.listdir(directory):
-            os.remove(os.path.join(directory, f))
-
         file_students = request.files['students']
         if file_students:
-            global students_file_name_
-            students_file_name_ = secure_filename(file_students.filename)
-            file_students.save(os.path.join(
-                app.config['RESULT_FOLDER'], "students.jpg"))
+            file_students_path = os.path.join(
+                app.config['UPLOAD_FOLDER_1'], "students.jpg")
+            file_students.save(file_students_path)
+            print("Saved students file to:", file_students_path)
+
+            
 
         file_answers = request.files['answers']
         if file_answers:
-            file_answers.save(os.path.join(
-                app.config['ANSWERS'], "answers.jpg"))
+            file_answers_path = os.path.join(
+                app.config['ANSWERS'], "answers.jpg")
+            file_answers.save(file_answers_path)
+            print("Saved students file to:", file_answers_path)
+
 
         return redirect('/result')
+    
 
     elif request.method == "GET":
         return render_template('index.html')
 
     else:
         return "Error 404: Page Not Found"
+
+'''
+        directory = './result'
+        for f in os.listdir(directory):
+            os.remove(os.path.join(directory, f))
+
+        file_students = request.files['students'] # just to match the name object in the html
+        if file_students:
+            global students_file_name_
+            students_file_name_ = secure_filename(file_students.filename)
+            file_students.save(os.path.join(
+                app.config['RESULT_FOLDER'], "students.jpg")) # save the result in the result folder and name it students.jpg
+'''
+
+        
 
 
 @app.route('/result', methods=['GET', 'POST'])
