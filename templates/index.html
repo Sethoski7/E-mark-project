@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<link rel="stylesheet" href="static/css/main.css">
+
+{% endblock %}
+
+{% block body %}
+
+<div>
+
+    <h1 style="padding-left: 212px;" class="v1">
+
+        Electronic Marking Website
+
+        <a style="float: right;" class="info-links" href="/info">Info about Software</a>
+
+    </h1>
+
+
+    <div id="frame">
+
+        <a style="float: right;" class="back-link" href="/result">Download Previous Results</a>
+
+        <form action="/" method="post" enctype="multipart/form-data">
+
+            <div id="frame">
+
+                <h3 class="head-1">Exam details</h3>
+                <p></p>
+
+                <label class="form-label" for="examName">Examination Name: </label>
+                <input class="form-text" autofocus autocomplete="off" maxlength="25" type="text" name="examName" id="i1"
+                    placeholder="Examination name" required>
+                &emsp; &emsp; &emsp; &emsp;
+                <label class="form-label" for="examDate">Exam Date: </label>
+                <input class="form-text" type="date" name="examDate" id="i9" placeholder="Examination Date" required>
+
+                <p></p>
+            </div>
+            <div id="frame">
+                <p></p>
+
+
+                <h3 class="head-1">Files</h3>
+                <label class="form-label" for="students">Students: </label>
+                <input type="file" id="f1" name="students" accept="image/*" required>
+                &ensp;
+                <label class="form-label" for="answers">Answers: </label>
+                <input type="file" id="f2" name="answers" accept="image/*" required>
+                &ensp;
+
+                <p></p>
+            </div>
+
+                <p></p>
+                <p></p>
+                <p></p>
+
+            </div>
+            <div id="frame">
+
+                <div class="submit">
+                    <input type="submit" value="Make Results">
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
