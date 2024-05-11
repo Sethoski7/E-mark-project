@@ -1,3 +1,4 @@
+
 """
 vps-auto-grading-software
 author: venisprajapati
@@ -17,8 +18,7 @@ from waitress import serve
 from threading import Timer
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, redirect, send_file, request, send_from_directory
-# from services.final_result_ import MakeFinalResults
-
+from main import process_image_files
 
 students_file_name_ = 'students.jpg'
 current_directory = os.getcwd()
@@ -55,6 +55,9 @@ def index():
             file_answers.save(file_answers_path)
             print("Saved students file to:", file_answers_path)
 
+        # do actual calculation/marking 
+        df = process_image_files('./uploads')
+        pass_percentage = (df['df'].value_counts(normalize=True)['Pass']*100).round(2)# this is to give it a percentage
 
         return redirect('/result')
     
@@ -84,11 +87,12 @@ def index():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
 
+    
     if request.method == 'POST':
         return 1000000000
 
     elif request.method == "GET":
-        return render_template('result.html')
+        return render_template('result.html', pass_percentage=pass_percentage, df=df)
 
     else:
         return "Error 404: Page Not Found"
