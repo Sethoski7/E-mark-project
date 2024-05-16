@@ -20,12 +20,26 @@
             <a class="back-link" href="/">Go to exam page</a>
 
             <div class="section-1">
+                <h1>EXAM RESULT</h1>
+                {% if '001.jpg' in file_marked %}
                 <p>
-                    doneee
+                    psc1908893 scored {{file_marked['001.jpg']}}
                 </p>
+                {% elif '002.jpg' in file_marked %}
                 <p>
-                    Happy Results ;)
+                    psc1908876 scored {{file_marked['002.jpg']}}
                 </p>
+                {% elif '003.jpg' in file_marked %}
+                <p>
+                    psc190776 scored {{file_marked['003.jpg']}}
+                </p>
+                {% elif '004.jpg' in file_marked %}
+                <p>
+                    psc190664 scored {{file_marked['004.jpg']}}
+                </p>
+                {% else  %}
+                <p>No scores available p</p>
+                {% endif %}
             </div>
 
         </div>
