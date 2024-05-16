@@ -1,116 +1,42 @@
 import os
-import cv2
-import time
 
-import numpy as np
-import pandas as pd
+def list_files(directory):
+    files = os.listdir(directory)
+    return files
 
-from tqdm import tqdm
-from rich import print
-from image_utils import id_block_read, find_paper, ans_block_read
+# Directory path to the "Images" directory
+images_directory = "/storage/emulated/0/Images/"  # Adjust the path as needed
 
-pass_score = 6
+file_scores = [ 100, 45, 76, 14, 66]
+file_list = []
+# List all files in the "Images" directory
+image_files = list_files(images_directory)
+print("Files in the 'Images' directory:")
+for file_name in image_files:
+    file_list.append(file_name)
 
-start_time = time.process_time()
+print(file_list)
 
+file_marked = dict( zip(file_list, file_scores))
 
-def process_image_files(image_directory):
-    datasets = []
-    correct_ans = []
-
-    for filename in os.listdir(image_directory):
-        if filename.endswith('.jpg') or filename.endswith('.png'):
-            img_path = os.path.join(image_directory, filename)
-            image = cv2.imread(img_path)
-
-            answer_sheet = cv2.resize(find_paper(image), (827, 1669))
-            student_id = id_block_read(answer_sheet, debug=False)
-            answers = ans_block_read(answer_sheet, 5)
-
-            if student_id == 0:
-                correct_ans = answers
-
-            data = {'id': student_id, 'answers': answers}
-            datasets.append(data.copy())
-
-    datasets = sorted(datasets, key=lambda data: data['id'])[1:]
-
-    for (idx, data) in enumerate(datasets):
-        datasets[idx]['answers_check'] = []
-
-        for (base, student) in zip(correct_ans, data['answers']):
-            datasets[idx]['answers_check'].append(base == student)
-
-    for data in datasets:
-        (_, count) = np.unique(data['answers_check'], return_counts=True)
-        data['correct'] = count[1]
-        data['incorrect'] = count[0]
-
-    df = pd.DataFrame(datasets)
-    df['pass'] = ["Pass" if d >= pass_score else "Not pass" for d in df['correct']]
-
-    return df
-
-# Example usage:
-# df = process_image_files('./uploads')
-# df.to_excel('out.xlsx', index=False)
+print (" so these are the script and their marks")
+print(file_marked)
+name = "seyh"
 
 
-'''
-def image_path_generator(directory):
-    for filename in os.listdir(directory):
-        if filename.endswith('.jpg') or filename.endsiwith('.png'):
-         yield os.path.join(directory, filename)
-
-         
-#imlist_generator = image_path_generator('./assets/images/')
-imlist = ['./uploads' + path for path in os.listdir('./uploads')]
-correct_ans = []
-datasets = []
-
-print('Reading answers from the sheet...')
 
 
-# for img in tqdm(imlist_generator, unit = 'Sheet'):
-for img in tqdm(imlist, unit = 'Sheet'):
 
-    image = cv2.imread(img)
 
-    answer_sheet = cv2.resize(find_paper(image), (827, 1669))
-    student_id = id_block_read(answer_sheet, debug = False)
-    answers = ans_block_read(answer_sheet, 5)
-    
-    if student_id == 0:
-        correct_ans = answers
-    
-    data = {'id': student_id, 'answers': answers}
-    datasets.append(data.copy())
 
-datasets = sorted(datasets, key = lambda data: data['id'])[1:]
 
-print(f'Correct answers(ID = 0): {correct_ans}')
-print(datasets)
-cv2.destroyAllWindows()
 
-for (idx, data) in enumerate(datasets):
-    
-    datasets[idx]['answers_check'] = []
-    
-    for (base, student) in zip(correct_ans, data['answers']):
-        datasets[idx]['answers_check'].append(base == student)
-        
-for data in datasets:
-    (_, count) = np.unique(data['answers_check'], return_counts = True)
-    data['correct'] = count[1]
-    data['incorrect'] = count[0]
-    
-df = pd.DataFrame(datasets)
-df['pass'] = ["Pass" if d >= pass_score else "Not pass" for d in df['correct']]
 
-df.to_excel('out.xlsx', index = False)
 
-elapsed_time = time.process_time() - start_time
 
-print(f'Done! Time elapsed: {elapsed_time:.2f} secs')
-print(f'Exporting data to excel spreadsheet at: {os.path.abspath("./out.xlsx")}')
-'''
+
+
+
+
+
+

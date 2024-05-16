@@ -8,22 +8,33 @@ file-name: app.py
 
 import os
 import webbrowser
-from waitress import serve
+import threading
+#from waitress import serve
 from threading import Timer
 from werkzeug.utils import secure_filename
-from flask import Flask, render_template, redirect, send_file, request, send_from_directory
-from main import process_image_files
+from flask import Flask, render_template, redirect, send_file, request, send_from_directory, url_for
+#from main import process_image_files
+import subprocess
+import json
+from main import file_marked
 
-students_file_name_ = 'students.jpg'
+
+students_file_name_ = '/students.jpg'
 current_directory = os.getcwd()
 print("Current Directory:", current_directory)
 # telling flask where to find the uploaded files in the folder
 app = Flask(__name__)
-UPLOAD_FOLDER_1 = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
+#UPLOAD_FOLDER_1 = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
+#app.config['UPLOAD_FOLDER_1'] = UPLOAD_FOLDER_1
+UPLOAD_FOLDER_1 = '/storage/emulated/0/learn/uploads'
 app.config['UPLOAD_FOLDER_1'] = UPLOAD_FOLDER_1
 
-ANSWERS = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
+
+#ANSWERS = r'E:\Users\HP 250\ExamChecker\exam-checker\uploads'
+#app.config['ANSWERS'] = ANSWERS
+ANSWERS = '/storage/emulated/0/learn/uploads'
 app.config['ANSWERS'] = ANSWERS
+
 
 #RESULT_FOLDER = './result'
 #app.config['RESULT_FOLDER'] = RESULT_FOLDER
@@ -35,8 +46,9 @@ def index():
     if request.method == 'POST':
         file_students = request.files['students']
         if file_students:
+            filename = secure_filename(file_students.filename)
             file_students_path = os.path.join(
-                app.config['UPLOAD_FOLDER_1'], "students.jpg")
+                app.config['UPLOAD_FOLDER_1'], filename)#changsd sruff here
             file_students.save(file_students_path)
             print("Saved students file to:", file_students_path)
 
@@ -50,10 +62,13 @@ def index():
             print("Saved students file to:", file_answers_path)
 
         # do actual calculation/marking 
-        df = process_image_files('./uploads')
-        pass_percentage = (df['df'].value_counts(normalize=True)['Pass']*100).round(2)# this is to give it a percentage
+      #  df = process_image_files('./uploads')
+     #   pass_percentage = (df['df'].value_counts(normalize=True)['Pass']*100).round(2)# this is to give it a percentage
+     
 
-        return redirect('/result')
+   
+        file_marked_json = json.dumps(file_marked)
+        return redirect(url_for('result', file_marked=file_marked_json))
     
 
     elif request.method == "GET":
@@ -80,16 +95,19 @@ def index():
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+	file_marked = request.args.get('file_marked')
+	file_marked = json.loads(file_marked)
+	return render_template('result.html', file_marked=file_marked)
 
     
-    if request.method == 'POST':
-        return 1000000000
+#    if request.method == 'POST':
+#        return 1000000000
 
-    elif request.method == "GET":
-        return render_template('result.html', pass_percentage=pass_percentage, df=df)
+  #  elif request.method == "GET":
+ #       return render_template('result.html', pass_percentage=pass_percentage, df=df)
 
-    else:
-        return "Error 404: Page Not Found"
+   # else:
+  #      return "Error 404: Page Not Found"
 
 
 @app.route('/info', methods=['GET'])
@@ -109,10 +127,5 @@ def open_web_browser():
 
 # main function :- program execution will starts from here
 if __name__ == '__main__':
-
-    print("Venis Prajapati's Auto grading Software Started At PORT: http://127.0.0.1:2102/")
-
-    Timer(1, open_web_browser).start()
-    serve(app, host="127.0.0.1", port=2102)
-
-    # app.run(port=2102, debug=True)
+	threading.Timer(1, open_web_browser).start()
+	app.run(host="127.0.0.1", port=2102)
